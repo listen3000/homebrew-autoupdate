@@ -61,6 +61,10 @@ module Homebrew
                description: "Starts the autoupdate command immediately and on system boot, " \
                             "instead of waiting for one interval (24 hours by default) to pass first. " \
                             "Must be passed with `start`."
+        flag   "--time=",
+               description: "Run once daily at the given 24-hour time (`HH:MM`) instead of on an " \
+                            "interval. Cannot be combined with an interval argument. " \
+                            "Must be passed with `start`."
         switch "--sudo",
                description: "If a cask requires `sudo`, autoupdate will open a GUI to ask for the password. " \
                             "Requires https://formulae.brew.sh/formula/pinentry-mac to be installed."

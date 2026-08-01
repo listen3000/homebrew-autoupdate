@@ -178,7 +178,30 @@ module Autoupdate
       FileUtils.chmod 0555, Autoupdate::Core.location/"brew_autoupdate_sudo_gui"
     end
 
+    odie "Provide either an interval or `--time`, not both." if args.time && interval.present?
+    if args.time && !args.time.match?(/^([01]?\d|2[0-3]):[0-5]\d$/)
+      odie "`--time` must be a 24-hour time in HH:MM format, e.g. `--time=03:00`."
+    end
+
     interval ||= "86400"
+
+    schedule = if args.time
+      hour, minute = args.time.split(":").map(&:to_i)
+      <<~EOS
+        <key>StartCalendarInterval</key>
+        <dict>
+            <key>Hour</key>
+            <integer>#{hour}</integer>
+            <key>Minute</key>
+            <integer>#{minute}</integer>
+        </dict>
+      EOS
+    else
+      <<~EOS
+        <key>StartInterval</key>
+        <integer>#{interval}</integer>
+      EOS
+    end
 
     # This restores the "Run At Load" key removed in a7de771abcf6 when requested.
     launch_immediately = if args.immediate?
@@ -208,8 +231,7 @@ module Autoupdate
         <string>#{log_out}</string>
         <key>StandardOutPath</key>
         <string>#{log_out}</string>
-        <key>StartInterval</key>
-        <integer>#{interval}</integer>
+        #{schedule.chomp.gsub("\n", "\n  ")}
         <key>LowPriorityBackgroundIO</key>
         <true/>
         <key>LowPriorityIO</key>
@@ -237,7 +259,11 @@ module Autoupdate
     # It'll behave strangely if someone wants autoupdate
     # to run more than once an hour, but... surely not?
     interval_to_hours = interval.to_i / 60 / 60
-    update_message = "Homebrew will now automatically update every #{interval_to_hours} hours"
+    update_message = if args.time
+      "Homebrew will now automatically update daily at #{args.time}"
+    else
+      "Homebrew will now automatically update every #{interval_to_hours} hours"
+    end
     if args.immediate?
       puts "#{update_message}, now, and on system boot."
     else
