@@ -51,6 +51,10 @@ module Homebrew
         switch "--greedy",
                description: "Upgrade casks with `--greedy` (include auto-updating casks). " \
                             "Must be passed with `start`."
+        switch "--skip-casks",
+               description: "Don't upgrade casks, even if the Caskroom exists locally. Useful to avoid " \
+                            "upgrading apps out from under themselves while they are running. " \
+                            "Must be passed with `--upgrade` and `start`."
         switch "--cleanup",
                description: "Automatically clean Homebrew's cache and logs. Must be passed with `start`."
         switch "--immediate",

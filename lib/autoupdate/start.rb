@@ -61,7 +61,7 @@ module Autoupdate
         auto_args << " && #{Autoupdate::Core.brew} upgrade --formula -v"
       end
 
-      if (HOMEBREW_PREFIX/"Caskroom").exist?
+      if (HOMEBREW_PREFIX/"Caskroom").exist? && !args.skip_casks?
         if ENV["SUDO_ASKPASS"].nil? && !args.sudo?
           opoo <<~EOS
             Please note if you use Casks that require `sudo` to upgrade,
