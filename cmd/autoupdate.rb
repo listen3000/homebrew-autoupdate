@@ -65,6 +65,10 @@ module Homebrew
                description: "Run once daily at the given 24-hour time (`HH:MM`) instead of on an " \
                             "interval. Cannot be combined with an interval argument. " \
                             "Must be passed with `start`."
+        flag   "--weekday=",
+               description: "With `--time`, run only on the given day of the week (a name like " \
+                            "`sunday`, or `0`-`6` with 0 as Sunday), making the schedule weekly " \
+                            "instead of daily. Must be passed with `start`."
         switch "--sudo",
                description: "If a cask requires `sudo`, autoupdate will open a GUI to ask for the password. " \
                             "Requires https://formulae.brew.sh/formula/pinentry-mac to be installed."

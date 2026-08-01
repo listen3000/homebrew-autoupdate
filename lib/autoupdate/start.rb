@@ -183,17 +183,30 @@ module Autoupdate
       odie "`--time` must be a 24-hour time in HH:MM format, e.g. `--time=03:00`."
     end
 
+    day_names = %w[sunday monday tuesday wednesday thursday friday saturday]
+    weekday = nil
+    if args.weekday
+      odie "`--weekday` requires `--time`." unless args.time
+      weekday = if args.weekday.match?(/^[0-6]$/)
+        args.weekday.to_i
+      else
+        day_names.index(args.weekday.downcase)
+      end
+      odie "`--weekday` must be a day name or 0-6 (0 = Sunday)." if weekday.nil?
+    end
+
     interval ||= "86400"
 
     schedule = if args.time
       hour, minute = args.time.split(":").map(&:to_i)
+      weekday_entry = weekday.nil? ? "" : "\n    <key>Weekday</key>\n    <integer>#{weekday}</integer>"
       <<~EOS
         <key>StartCalendarInterval</key>
         <dict>
             <key>Hour</key>
             <integer>#{hour}</integer>
             <key>Minute</key>
-            <integer>#{minute}</integer>
+            <integer>#{minute}</integer>#{weekday_entry}
         </dict>
       EOS
     else
@@ -259,7 +272,9 @@ module Autoupdate
     # It'll behave strangely if someone wants autoupdate
     # to run more than once an hour, but... surely not?
     interval_to_hours = interval.to_i / 60 / 60
-    update_message = if args.time
+    update_message = if args.time && weekday
+      "Homebrew will now automatically update every #{day_names[weekday].capitalize} at #{args.time}"
+    elsif args.time
       "Homebrew will now automatically update daily at #{args.time}"
     else
       "Homebrew will now automatically update every #{interval_to_hours} hours"
