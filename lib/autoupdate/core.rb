@@ -29,13 +29,7 @@ module Autoupdate
     end
 
     def tap_dir
-      origin = if Tap.fetch("homebrew/homebrew-autoupdate").path.exist?
-        "Homebrew"
-      else
-        "domt4"
-      end
-
-      Pathname.new(File.join(HOMEBREW_LIBRARY, "Taps", origin, "homebrew-autoupdate"))
+      Pathname.new(File.expand_path("../..", __dir__))
     end
   end
 end
